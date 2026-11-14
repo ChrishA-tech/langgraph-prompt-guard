@@ -23,7 +23,7 @@ def default_structured_llm_simulator(sanitized_prompt: str) -> str:
 
     # Extract capitalized entities and numeric percentages/currencies
     capitalized = re.findall(r"\b[A-Z][a-zA-Z0-9&\-]{2,}\b", sanitized_prompt)
-    metrics = re.findall(r"\b\d+(?:\.\d+)?%?(?:\s*(?:million|billion|bps|USD|GBP))?\b", sanitized_prompt)
+    metrics = re.findall(r"\b\d+(?:\.\d+)?(?:%|(?:\s*(?:million|billion|bps|USD|GBP)\b))?", sanitized_prompt)
     entities = list(dict.fromkeys(capitalized[:6]))
 
     sentiment = "neutral"
