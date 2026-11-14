@@ -112,3 +112,20 @@ def test_workflow_uses_classifier(clf):
     r = run_protected_extraction_workflow("u1", "Summarise: Apple bought Beats for $3bn in 2014.",
                                           classifier=AlwaysAttack())
     assert r.status == "blocked" and "ML_CLASSIFIER" in r.guardrail.matched_rules
+
+
+def test_api_classifier_is_opt_in(monkeypatch):
+    from fastapi.testclient import TestClient
+    import promptguard.api as api
+    c = TestClient(api.app)
+    assert api._CLF is None and c.get("/health").json()["input_guard"] == "rules"
+    ok = c.post("/api/v1/extract", json={"user_id": "user_1", "prompt": "Summarize the Bank of England CPI report for October."})
+    assert ok.status_code == 200
+
+    class AlwaysAttack:
+        threshold = 0.5
+        def probability(self, text):
+            return 0.99
+    monkeypatch.setattr(api, "_CLF", AlwaysAttack())
+    r = c.post("/api/v1/extract", json={"user_id": "user_1", "prompt": "Summarize the Bank of England CPI report for October."})
+    assert r.status_code == 403 and "ML_CLASSIFIER" in r.json()["guardrail"]["matched_rules"]

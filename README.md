@@ -5,8 +5,8 @@ A **LangGraph** workflow that screens prompts for injection and jailbreak attemp
 **self-repair retry**, and checks the LLM output for **PII, secrets and system-prompt leakage** before returning it.
 Served through FastAPI with request IDs and a structured audit log.
 
-Input screening has two layers: explainable **rules** first, then a **learned classifier** (TF-IDF n-grams +
-logistic regression, trained on deepset/prompt-injections) that catches paraphrased and German attacks the rules miss.
+Input screening: explainable **rules**, plus an optional **learned classifier** (TF-IDF n-grams + logistic
+regression, trained on deepset/prompt-injections) that catches paraphrased and German attacks the rules miss.
 
 ```
 input_guardrail ──safe──▶ llm_extraction ──valid──▶ output_guard ──▶ END
@@ -45,7 +45,12 @@ Held-out (deepset test split): rules alone flag 5/60 attacks; rules + classifier
   train split) and scored once on the **test split**, the headline comparison. The test split is small, so
   recall is shown with a 95% Wilson interval.
 - Rules are fast and explainable but miss paraphrased attacks on their own; the classifier closes much of that
-  gap; the output guard and schema validation remain the last line of defence.
+  gap on deepset-style prompts; the output guard and schema validation remain the last line of defence.
+- **Limitation found:** on the hand-written dev set (a different style of prompt) the classifier wrongly flags
+  about a third of benign prompts, e.g. *"Summarize the Bank of England CPI report for October."* It learned
+  deepset's phrasing more than injection in general. So the API and the agent use the **rules only by default**;
+  the classifier is opt-in (`PROMPTGUARD_CLASSIFIER=on`) for screening or flagging for review. Next step: more
+  varied benign training data, or a fine-tuned transformer, evaluated on a second out-of-distribution set.
 
 ## Components
 
@@ -66,7 +71,8 @@ Held-out (deepset test split): rules alone flag 5/60 attacks; rules + classifier
 pip install -r requirements.txt
 python -m promptguard.evaluate          # downloads deepset/prompt-injections, trains + saves models/, scores all guards
 python -m pytest -q
-uvicorn promptguard.api:app --reload    # simulator; uses models/ classifier if present (PROMPTGUARD_CLASSIFIER=off to disable)
+uvicorn promptguard.api:app --reload    # simulator, rules only
+PROMPTGUARD_CLASSIFIER=on uvicorn promptguard.api:app   # rules + trained classifier (models/)
 PROMPTGUARD_LLM=claude ANTHROPIC_API_KEY=... uvicorn promptguard.api:app   # Claude
 ```
 
