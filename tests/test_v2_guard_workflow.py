@@ -186,3 +186,12 @@ def test_load_deepset_paginates(monkeypatch, tmp_path):
     monkeypatch.setattr(ev, "DATA", tmp_path)
     rows = load_deepset(refresh=True)
     assert len(rows) == 180 and rows[0]["text"] == "train0" and (tmp_path / "deepset_prompt_injections.json").exists()
+
+
+def test_evaluate_continues_when_download_fails(monkeypatch, tmp_path):
+    import promptguard.evaluate as ev
+    monkeypatch.setattr(ev, "RESULTS", tmp_path)
+    monkeypatch.setattr(ev, "load_deepset", lambda refresh=False: (_ for _ in ()).throw(OSError("offline")))
+    with pytest.raises(SystemExit, match="deepset"):
+        ev.main(["--datasets", "dev", "deepset"])
+    assert json.loads((tmp_path / "eval.json").read_text())["datasets"].keys() == {"dev"}
