@@ -2,5 +2,7 @@ pydantic>=2.5
 fastapi>=0.110
 httpx>=0.27
 langgraph>=0.2
+scikit-learn>=1.3
+joblib>=1.3
 pytest>=7.4
 # optional: anthropic>=0.40 (Claude extractor)
