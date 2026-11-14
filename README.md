@@ -14,7 +14,18 @@ input_guardrail ──safe──▶ llm_extraction ──valid──▶ output_g
 ## Evaluation
 
 <!-- RESULTS:START -->
-_Not run yet: `python -m promptguard.evaluate` downloads the public test set and fills in this section._
+Run 2026-11-14. A prompt counts as flagged when the guardrail blocks it.
+
+| Dataset | Guardrail | Precision | Recall | F1 | False-positive rate | Accuracy |
+|---|---|---|---|---|---|---|
+| Dev set (60, in-sample) | v1 (original) | 0.857 | 0.400 | 0.545 | 0.067 | 0.667 |
+| Dev set (60, in-sample) | v2 strict | 0.968 | 1.000 | 0.984 | 0.033 | 0.983 |
+| Dev set (60, in-sample) | v2 lenient | 0.967 | 0.967 | 0.967 | 0.033 | 0.967 |
+| deepset/prompt-injections (662, held-out) | v1 (original) | 1.000 | 0.011 | 0.023 | 0.000 | 0.607 |
+| deepset/prompt-injections (662, held-out) | v2 strict | 1.000 | **0.080** | **0.148** | 0.000 | 0.634 |
+| deepset/prompt-injections (662, held-out) | v2 lenient | 1.000 | 0.080 | 0.148 | 0.000 | 0.634 |
+
+Held-out (deepset, v2 strict): 21/263 attacks flagged, 0/399 benign prompts wrongly flagged, 0.059 ms per prompt. Rule-based screening misses many paraphrased and non-English injections; see results/eval.md for examples.
 <!-- RESULTS:END -->
 
 The **dev set** (60 hand-written prompts) was used while writing the v2 rules, so its scores are in-sample.
