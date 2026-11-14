@@ -36,3 +36,6 @@ class WorkflowResponse(BaseModel):
     guardrail: GuardrailAssessment
     extracted_data: Optional[ExtractedEntitySchema] = None
     error_detail: Optional[str] = None
+    request_id: Optional[str] = Field(default=None, description="Correlation ID for the audit log")
+    extraction_attempts: int = Field(default=0, description="LLM calls made (1 + self-repair retries)")
+    output_redactions: List[str] = Field(default_factory=list, description="Types of data redacted by the output guard")

@@ -1,3 +1,4 @@
+"""Original v1 guardrail, frozen unchanged for comparison in evaluation/ (do not edit)."""
 import re
 from typing import Tuple, List
 from .schemas import GuardrailAssessment

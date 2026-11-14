@@ -1,9 +1,9 @@
 import json
 import unittest
-from src.guardrails import evaluate_prompt_safety
-from src.extractor import extract_schema_constrained_json
-from src.exceptions import SchemaExtractionError
-from src.workflow import run_protected_extraction_workflow
+from promptguard.guardrails import evaluate_prompt_safety
+from promptguard.extractor import extract_schema_constrained_json
+from promptguard.exceptions import SchemaExtractionError
+from promptguard.workflow import run_protected_extraction_workflow
 
 
 class TestLangGraphPromptGuard(unittest.TestCase):

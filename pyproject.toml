@@ -1,0 +1,21 @@
+[project]
+name = "promptguard"
+version = "2.0.0"
+description = "LangGraph guarded extraction: prompt-injection screening, schema-constrained LLM JSON, output guard"
+requires-python = ">=3.9"
+dependencies = ["pydantic>=2.5", "fastapi>=0.110"]
+
+[project.optional-dependencies]
+graph = ["langgraph>=0.2"]
+claude = ["anthropic>=0.40"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["promptguard"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
